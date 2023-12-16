@@ -9,44 +9,34 @@ class Asci extends Thread {
         this.isim = isim;
         this.mesgulMu = false;
     }
-    @Override
-    public void run() {
-        super.run();
-        while (true) {
-            synchronized (lock) {
-                if(this.musteriler.size() == 1){
-                    this.mesgulMu = true;
-                    System.out.println(this.getIsim() + " " + this.musteriler.get(0).getIsim() + "'in yemeğini  hazırlıyor");
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    this.musteriler.get(0).setYemekOlduMu(true);
-                    this.musteriler.remove(0);
-                    this.mesgulMu = false;
-                }
-                else if(this.musteriler.size() == 2){
-                    this.mesgulMu = true;
-                    System.out.println(this.musteriler.get(0).getIsim() + "'in yemeği  hazırlanıyor");
-                    System.out.println(this.musteriler.get(1).getIsim() + "'in yemeği  hazırlanıyor");
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    this.musteriler.get(0).setYemekOlduMu(true);
-                    this.musteriler.get(1).setYemekOlduMu(true);
-                    this.mesgulMu = false;
-                    try {
-                        lock.wait();
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+    public synchronized void yemekHazırla(){
+        if(this.getMusteriler().size() == 1) {
+            this.setMesgulMu(true);
+            System.out.println(this.getIsim() + " " + this.getMusteriler().get(0).getIsim() + "'in yemeğini  hazırlıyor");
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            this.getMusteriler().get(0).setYemekOlduMu(true);
+            this.getMusteriler().remove(0);
+            this.setMesgulMu(false);
+            while(true){
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }
     }
+    @Override
+    public void run() {
+        super.run();
+        while (true) {
+                yemekHazırla();
+            }
+        }
     public String getIsim() {
         return isim;
     }

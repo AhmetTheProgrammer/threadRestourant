@@ -11,24 +11,22 @@ class Musteri extends Thread {
         this.yemekOlduMu = false;
         this.masalar = masalar;
     }
-    @Override
-    public void run() {
-        super.run();
-        synchronized (lock){
-            for (Masa masa : this.masalar) {
-                if(!masa.isDoluMu()){//Dolu değilse
-                    this.masa = masa;
-                    this.masa.setDoluMu(true);
-                    System.out.println(this.getIsim() + " " + this.masa.getIsim() + "a oturdu");
-                    break;
-                }
+    public synchronized void masayaOtur(){
+        for (Masa masa : this.getMasalar()) {
+            if(!masa.isDoluMu()){//Dolu değilse
+                this.setMasa(masa);
+                this.getMasa().setDoluMu(true);
+                System.out.println(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu");
+                break;
             }
-            while(!yemekOlduMu){
-                try {
-                    lock.wait();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+        }
+    }
+    public synchronized void yemekYe(){
+        while(!this.isYemekOlduMu()){
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
         try {
@@ -37,7 +35,13 @@ class Musteri extends Thread {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+    @Override
+    public void run() {
+        super.run();
 
+        masayaOtur();
+        yemekYe();
     }
     public String getIsim() {
         return isim;

@@ -10,35 +10,35 @@ public class Garson extends Thread{
         this.isim = isim;
         this.siparisAldıMı = false;
     }
+    public synchronized void siparisAl(){
+        Musteri musteri = this.getMusteriler().get(0);
+        System.out.println(this.getIsim() + " :" + musteri.getIsim() + "'nin siparişini alıyor.");
+        for (Asci asci : this.getAscilar()) {
+            if(!asci.isMesgulMu()){
+                asci.getMusteriler().add(musteri);
+                break;
+            }
+        }
+        this.getMusteriler().remove(0);
+        this.setSiparisAldıMı(true);
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        while(true){
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
     @Override
     public void run() {
         super.run();
-        while (!this.musteriler.isEmpty()) {
-            synchronized (lock) {
-                if(!this.musteriler.isEmpty()){
-                    Musteri musteri = this.musteriler.get(0);
-                    System.out.println(this.getIsim() + " :" + musteri.getIsim() + "'nin siparişini alıyor.");
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    for (Asci asci : this.ascilar) {
-                        if(asci.isMesgulMu() == false){
-                            asci.getMusteriler().add(musteri);
-                            break;
-                        }
-                    }
-                    this.musteriler.remove(0);
-                    this.siparisAldıMı = true;
-
-                    try {
-                        lock.wait();
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
+        while (!this.isSiparisAldıMı()) {
+            siparisAl();
         }
     }
     public String getIsim() {
@@ -60,5 +60,13 @@ public class Garson extends Thread{
 
     public void setAscilar(ArrayList<Asci> ascilar) {
         this.ascilar = ascilar;
+    }
+
+    public boolean isSiparisAldıMı() {
+        return siparisAldıMı;
+    }
+
+    public void setSiparisAldıMı(boolean siparisAldıMı) {
+        this.siparisAldıMı = siparisAldıMı;
     }
 }
