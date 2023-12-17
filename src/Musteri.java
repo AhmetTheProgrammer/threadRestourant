@@ -2,17 +2,16 @@ import java.util.ArrayList;
 
 class Musteri extends Thread {
     private String isim;
-    private ArrayList<Masa> masalar;
     private Masa masa;
+    private boolean siparisAlindiMi;
     private boolean yemekOlduMu;
     private static final Object lock = new Object();
-    public Musteri(String isim, ArrayList<Masa> masalar){
+    public Musteri(String isim){
         this.isim = isim;
         this.yemekOlduMu = false;
-        this.masalar = masalar;
     }
     public synchronized void masayaOtur(){
-        for (Masa masa : this.getMasalar()) {
+        for (Masa masa : Restaurant.masalar) {
             if(!masa.isDoluMu()){//Dolu değilse
                 this.setMasa(masa);
                 this.getMasa().setDoluMu(true);
@@ -20,40 +19,34 @@ class Musteri extends Thread {
                 break;
             }
         }
+        yemekBekle();
+    }
+    public synchronized void yemekBekle(){
+        while(!this.isYemekOlduMu()){
+
+        }
+        yemekYe();
     }
     public synchronized void yemekYe(){
-        while(!this.isYemekOlduMu()){
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
         try {
             System.out.println(this.getIsim() + "yemeğini yiyiyor");
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        System.out.println(this.isAlive());
     }
     @Override
     public void run() {
         super.run();
-
         masayaOtur();
-        yemekYe();
+        yemekBekle();
     }
     public String getIsim() {
         return isim;
     }
     public void setIsim(String isim) {
         this.isim = isim;
-    }
-    public ArrayList<Masa> getMasalar() {
-        return masalar;
-    }
-    public void setMasalar(ArrayList<Masa> masalar) {
-        this.masalar = masalar;
     }
     public Masa getMasa() {
         return masa;
@@ -68,5 +61,13 @@ class Musteri extends Thread {
 
     public void setYemekOlduMu(boolean yemekOlduMu) {
         this.yemekOlduMu = yemekOlduMu;
+    }
+
+    public boolean isSiparisAlindiMi() {
+        return siparisAlindiMi;
+    }
+
+    public void setSiparisAlindiMi(boolean siparisAlindiMi) {
+        this.siparisAlindiMi = siparisAlindiMi;
     }
 }

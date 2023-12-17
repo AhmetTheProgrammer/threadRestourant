@@ -1,31 +1,38 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Garson extends Thread{
     private String isim;
-    private ArrayList<Musteri> musteriler;
-    private ArrayList<Asci> ascilar;
     private boolean siparisAldıMı;
-    private static final Object lock = new Object();
+    private boolean siparisIletildiMi;
     public Garson(String isim){
         this.isim = isim;
         this.siparisAldıMı = false;
     }
     public synchronized void siparisAl(){
-        Musteri musteri = this.getMusteriler().get(0);
+        Musteri musteri = Restaurant.musteriler.poll();
+
         System.out.println(this.getIsim() + " :" + musteri.getIsim() + "'nin siparişini alıyor.");
-        for (Asci asci : this.getAscilar()) {
-            if(!asci.isMesgulMu()){
-                asci.getMusteriler().add(musteri);
-                break;
-            }
-        }
-        this.getMusteriler().remove(0);
-        this.setSiparisAldıMı(true);
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        do{
+            Iterator iterator = Restaurant.ascilar.iterator();
+            Asci asci;
+            while(iterator.hasNext()){
+                asci = (Asci) iterator.next();
+                if(asci.getMusteri() == null){
+                    asci.setMusteri(musteri);
+                    this.setSiparisIletildiMi(true);
+                    break;
+                }
+            }
+        }while(!this.isSiparisIletildiMi());
+        bekle();
+    }
+    public synchronized void bekle(){
         while(true){
             try {
                 wait();
@@ -37,7 +44,7 @@ public class Garson extends Thread{
     @Override
     public void run() {
         super.run();
-        while (!this.isSiparisAldıMı()) {
+        while(true){
             siparisAl();
         }
     }
@@ -47,26 +54,18 @@ public class Garson extends Thread{
     public void setIsim(String isim) {
         this.isim = isim;
     }
-    public ArrayList<Musteri> getMusteriler() {
-        return musteriler;
-    }
-    public void setMusteriler(ArrayList<Musteri> musteriler) {
-        this.musteriler = musteriler;
-    }
-
-    public ArrayList<Asci> getAscilar() {
-        return ascilar;
-    }
-
-    public void setAscilar(ArrayList<Asci> ascilar) {
-        this.ascilar = ascilar;
-    }
-
     public boolean isSiparisAldıMı() {
         return siparisAldıMı;
     }
-
     public void setSiparisAldıMı(boolean siparisAldıMı) {
         this.siparisAldıMı = siparisAldıMı;
+    }
+
+    public boolean isSiparisIletildiMi() {
+        return siparisIletildiMi;
+    }
+
+    public void setSiparisIletildiMi(boolean siparisIletildiMi) {
+        this.siparisIletildiMi = siparisIletildiMi;
     }
 }
