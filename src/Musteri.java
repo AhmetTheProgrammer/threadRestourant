@@ -21,8 +21,6 @@ class Musteri implements Runnable {
                 }
             }
         }
-        yemekBekle();
-
     }
 
     public void AsciIslemleri(Asci asci, Musteri musteri){
@@ -46,19 +44,21 @@ class Musteri implements Runnable {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            odemeYap(musteri);
+            odemeYap();
         }
     }
-    public  void odemeYap(Musteri musteri){
+    public  void odemeYap(){
         synchronized (lock){
-            System.out.println(musteri.getIsim()+" ödeme yaptı");
-            musteri.odemeYapildiMi=true;
+            System.out.println(this.getIsim()+" ödeme yaptı");
+            this.setOdemeYapildiMi(true);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
+        this.getMasa().setDoluMu(false);
+        this.setMasa(null);
     }
 
     public synchronized void yemekBekle(){
@@ -68,7 +68,12 @@ class Musteri implements Runnable {
 
     @Override
     public void run() {
-        masayaOtur();
+        //masası boşsa sürekli oturmaya çalışır
+        synchronized (lock){
+            while(this.getMasa() == null){
+                masayaOtur();
+            }
+        }
         yemekBekle();
     }
     public String getIsim() {

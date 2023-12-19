@@ -26,6 +26,19 @@ public class Main {
             Thread t=new Thread(musteri);
             t.start();
         }
+        //En az 6 müşterinin masası set edilene kadar bekler
+        while(true){
+            int doluMasaSayisi = 0;
+            for (Masa masa : Restaurant.masalar) {
+                if(masa.isDoluMu()){
+                    doluMasaSayisi++;
+                }
+            }
+            if(doluMasaSayisi >= 6){
+                break;
+            }
+        }
+
         for (int i = 1; i <= 2; i++) {
             Asci asci = new Asci("Aşçı " + i);
             Restaurant.ascilar.add(asci);

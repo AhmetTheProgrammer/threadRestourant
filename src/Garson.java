@@ -14,9 +14,10 @@ public class Garson implements Runnable{
     public  void siparisAl() throws InterruptedException {
         synchronized (lock){
             Musteri musteri = Restaurant.musteriler.poll();
-            if(musteri == null){
+            if(musteri == null || musteri.getMasa() == null){//müşteri yoksa sipariş alma
                 // lock.wait();
-            }else{
+                System.out.println("logic hata");
+            }else if(musteri.getMasa() != null){//masası varsa sipariş al
                 System.out.println(this.getIsim() + " :" + musteri.getIsim() + "'nin siparişini alıyor.");
                 try {
                     Thread.sleep(2000);
@@ -33,8 +34,6 @@ public class Garson implements Runnable{
                 bekle();
             }
         }
-
-
     }
     public synchronized void bekle(){
         try {
