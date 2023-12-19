@@ -11,15 +11,18 @@ class Musteri implements Runnable {
         odemeYapildiMi=false;
     }
     public synchronized void masayaOtur(){
-        for (Masa masa : Restaurant.masalar) {
-            if(!masa.isDoluMu()){//Dolu değilse
-                this.setMasa(masa);
-                this.getMasa().setDoluMu(true);
-                System.out.println(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu");
-                break;
+        synchronized (Restaurant.masalar)  {
+            for (Masa masa : Restaurant.masalar) {
+                if(!masa.isDoluMu()){//Dolu değilse
+                    this.setMasa(masa);
+                    this.getMasa().setDoluMu(true);
+                    System.out.println(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu");
+                    break;
+                }
             }
         }
         yemekBekle();
+
     }
 
     public void AsciIslemleri(Asci asci, Musteri musteri){
