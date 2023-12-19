@@ -23,7 +23,8 @@ public class Main {
         for(int i = 1; i <= musteriSayisi; i++){
             Musteri musteri = new Musteri("Müşteri " + i);
             Restaurant.musteriler.add(musteri);
-            musteri.start();
+            Thread t=new Thread(musteri);
+            t.start();
         }
         for (int i = 1; i <= 2; i++) {
             Asci asci = new Asci("Aşçı " + i);
@@ -33,14 +34,22 @@ public class Main {
         for (int i = 1; i <= 3; i++) {
             Garson garson = new Garson("Garson " + i);
             garsonlar.add(garson);
+            Thread t=new Thread(garson);
+            t.start();
         }
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        for (Garson garson: garsonlar) {
-            garson.start();
-        }
+
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

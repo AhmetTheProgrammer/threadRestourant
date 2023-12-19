@@ -34,11 +34,11 @@ class Asci extends Thread {
     @Override
     public void run() {
         super.run();
-        while(true){
+       /* while(true){
             if(this.getMusteri() != null){
-                yemekHazırla();
+             //   yemekHazırla();
             }
-        }
+        }*/
     }
     public String getIsim() {
         return isim;
