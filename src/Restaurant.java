@@ -4,7 +4,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Restaurant {
     public static ConcurrentLinkedDeque<Musteri> musteriler = new ConcurrentLinkedDeque<>();
-    public static CopyOnWriteArrayList<Asci> ascilar = new CopyOnWriteArrayList<>();
+    public static ArrayList<Asci> ascilar = new ArrayList<>();
     public static ArrayList<Masa> masalar = new ArrayList<>();
     Restaurant(){
 

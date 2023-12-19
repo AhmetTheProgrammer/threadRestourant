@@ -1,51 +1,56 @@
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
-public class Garson extends Thread{
+public class Garson implements Runnable{
     private String isim;
     private boolean siparisAldıMı;
     private boolean siparisIletildiMi;
+    private  final  Object  lock =new Object();
     public Garson(String isim){
         this.isim = isim;
         this.siparisAldıMı = false;
     }
-    public synchronized void siparisAl(){
-        Musteri musteri = Restaurant.musteriler.poll();
-
-        System.out.println(this.getIsim() + " :" + musteri.getIsim() + "'nin siparişini alıyor.");
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        do{
-            Iterator iterator = Restaurant.ascilar.iterator();
-            Asci asci;
-            while(iterator.hasNext()){
-                asci = (Asci) iterator.next();
-                if(asci.getMusteri() == null){
-                    asci.setMusteri(musteri);
-                    this.setSiparisIletildiMi(true);
-                    break;
+    public  void siparisAl() throws InterruptedException {
+        synchronized (lock){
+            Musteri musteri = Restaurant.musteriler.poll();
+            if(musteri == null){
+                // lock.wait();
+            }else{
+                System.out.println(this.getIsim() + " :" + musteri.getIsim() + "'nin siparişini alıyor.");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
+                for(int i=0;i<Restaurant.ascilar.size();i++){
+                    if(Restaurant.ascilar.get(i).musteri == null && Restaurant.ascilar.get(i).isMesgulMu()==false && musteri.isOdemeYapildiMi()==false){ // 0. aşçının müşterisi yoksa
+                        Restaurant.ascilar.get(i).setMusteri(musteri);
+                        Restaurant.ascilar.get(i).setMesgulMu(true);
+                        musteri.AsciIslemleri(Restaurant.ascilar.get(i),musteri); // boş olan aşçıyı müşteriye yolla
+                    }
+                }
+                bekle();
             }
-        }while(!this.isSiparisIletildiMi());
-        bekle();
+        }
+
+
     }
     public synchronized void bekle(){
-        while(true){
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        try {
+            Thread.sleep(6000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
     @Override
     public void run() {
-        super.run();
         while(true){
-            siparisAl();
+            try {
+                siparisAl();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
     public String getIsim() {

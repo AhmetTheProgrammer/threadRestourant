@@ -1,14 +1,14 @@
-import java.util.ArrayList;
-
-class Musteri extends Thread {
+class Musteri implements Runnable {
     private String isim;
     private Masa masa;
     private boolean siparisAlindiMi;
     private boolean yemekOlduMu;
+    private  boolean odemeYapildiMi;
     private static final Object lock = new Object();
     public Musteri(String isim){
         this.isim = isim;
         this.yemekOlduMu = false;
+        odemeYapildiMi=false;
     }
     public synchronized void masayaOtur(){
         for (Masa masa : Restaurant.masalar) {
@@ -21,24 +21,50 @@ class Musteri extends Thread {
         }
         yemekBekle();
     }
-    public synchronized void yemekBekle(){
-        while(!this.isYemekOlduMu()){
 
-        }
-        yemekYe();
-    }
-    public synchronized void yemekYe(){
+    public void AsciIslemleri(Asci asci, Musteri musteri){
+        asci.setMesgulMu(true);
+        System.out.println(asci.getIsim() +" "+musteri.getIsim()+" 'in yemeğinin hazırlıyor");
         try {
-            System.out.println(this.getIsim() + "yemeğini yiyiyor");
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(this.isAlive());
+        musteri.setYemekOlduMu(true);
+        asci.setMusteri(null);
+        asci.setMesgulMu(false);
+        yemekYe(musteri);
     }
+    public  void yemekYe(Musteri musteri){
+        synchronized (lock) {
+            try {
+                System.out.println(this.getIsim() + "yemeğini yiyiyor");
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            odemeYap(musteri);
+        }
+    }
+    public  void odemeYap(Musteri musteri){
+        synchronized (lock){
+            System.out.println(musteri.getIsim()+" ödeme yaptı");
+            musteri.odemeYapildiMi=true;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public synchronized void yemekBekle(){
+        while(!this.isYemekOlduMu()){
+        }
+    }
+
     @Override
     public void run() {
-        super.run();
         masayaOtur();
         yemekBekle();
     }
@@ -69,5 +95,13 @@ class Musteri extends Thread {
 
     public void setSiparisAlindiMi(boolean siparisAlindiMi) {
         this.siparisAlindiMi = siparisAlindiMi;
+    }
+
+    public boolean isOdemeYapildiMi() {
+        return odemeYapildiMi;
+    }
+
+    public void setOdemeYapildiMi(boolean odemeYapildiMi) {
+        this.odemeYapildiMi = odemeYapildiMi;
     }
 }
