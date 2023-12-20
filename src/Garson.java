@@ -16,7 +16,7 @@ public class Garson implements Runnable{
             Musteri musteri = Restaurant.musteriler.poll();
             if(musteri == null || musteri.getMasa() == null){//müşteri yoksa sipariş alma
                 // lock.wait();
-                System.out.println("logic hata");
+                Restaurant.musteriler.add(musteri);
             }else if(musteri.getMasa() != null){//masası varsa sipariş al
                 System.out.println(this.getIsim() + " :" + musteri.getIsim() + "'nin siparişini alıyor.");
                 try {
@@ -24,13 +24,17 @@ public class Garson implements Runnable{
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                for(int i=0;i<Restaurant.ascilar.size();i++){
-                    if(Restaurant.ascilar.get(i).musteri == null && Restaurant.ascilar.get(i).isMesgulMu()==false && musteri.isOdemeYapildiMi()==false){ // 0. aşçının müşterisi yoksa
-                        Restaurant.ascilar.get(i).setMusteri(musteri);
-                        Restaurant.ascilar.get(i).setMesgulMu(true);
-                        musteri.AsciIslemleri(Restaurant.ascilar.get(i),musteri); // boş olan aşçıyı müşteriye yolla
+                while(musteri.isYemekOlduMu() == false){
+                    for(int i=0;i<Restaurant.ascilar.size();i++){
+                        if(Restaurant.ascilar.get(i).musteri == null && Restaurant.ascilar.get(i).isMesgulMu()==false && musteri.isOdemeYapildiMi()==false){ // 0. aşçının müşterisi yoksa
+                            Restaurant.ascilar.get(i).setMusteri(musteri);
+                            Restaurant.ascilar.get(i).setMesgulMu(true);
+                            musteri.AsciIslemleri(Restaurant.ascilar.get(i),musteri); // boş olan aşçıyı müşteriye yolla
+                            break;
+                        }
                     }
                 }
+
                 bekle();
             }
         }
@@ -44,7 +48,7 @@ public class Garson implements Runnable{
     }
     @Override
     public void run() {
-        while(true){
+        while(!Restaurant.musteriler.isEmpty()){
             try {
                 siparisAl();
             } catch (InterruptedException e) {

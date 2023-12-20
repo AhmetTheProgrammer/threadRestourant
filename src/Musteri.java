@@ -62,19 +62,18 @@ class Musteri implements Runnable {
     }
 
     public synchronized void yemekBekle(){
-        while(!this.isYemekOlduMu()){
+        while(!this.isYemekOlduMu())
+        {
+
         }
     }
 
     @Override
     public void run() {
         //masası boşsa sürekli oturmaya çalışır
-        synchronized (lock){
-            while(this.getMasa() == null){
-                masayaOtur();
-            }
+        while(this.getMasa() == null){
+            masayaOtur();
         }
-        yemekBekle();
     }
     public String getIsim() {
         return isim;
