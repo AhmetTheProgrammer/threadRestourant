@@ -10,48 +10,47 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class Main {
     public static void main(String[] args) {
         ArrayList<Garson> garsonlar = new ArrayList<>();
-        ConcurrentLinkedQueue<Musteri> oncelikliler = new ConcurrentLinkedQueue<>();
-        ConcurrentLinkedQueue<Musteri> gecici = new ConcurrentLinkedQueue<>();
+        int toplam = 0;
+        int musteriCount = 1;
         Scanner scanner = new Scanner(System.in);
         Random random = new Random();
         System.out.println("Adım sayısını giriniz:");
-        int adimSayisi=scanner.nextInt();
-        int mustericount=1;
+        int adimSayisi = scanner.nextInt();
         Kasa kasa = new Kasa();
         kasa.start();
         for(int i = 1; i <= 6; i++){
             Masa masa = new Masa("Masa " + i);
             Restaurant.masalar.add(masa);
         }
-        int toplam=0;
-        for(int j=0;j<adimSayisi;j++){
-            System.out.println((j+1)+ " .Adımın Müşteri sayısı girin:");
+        while (adimSayisi  > 0){
+            System.out.println("Müşteri sayısı girin:");
             int musteriSayisi = scanner.nextInt();
-            toplam=toplam+musteriSayisi;
+            toplam += musteriSayisi;
             System.out.println("Öncelikli müşteri sayısı girin:");
             int oncelikliMusteriSayisi = scanner.nextInt();
-            for(int i = mustericount; i <= toplam; i++){
+            for(int i = musteriCount; i <= toplam; i++){
                 if(oncelikliMusteriSayisi > 0){
                     int oncelik = random.nextInt(0,2);
                     if(oncelik == 1){
                         Musteri musteri = new Musteri("Müşteri " + i);
-                        mustericount++;
                         musteri.setOncelikliMi(true);
                         Restaurant.musteriler.addFirst(musteri);
+                        musteriCount++;
                         oncelikliMusteriSayisi--;
                     }
                     else{
                         Musteri musteri = new Musteri("Müşteri " + i);
-                        mustericount++;
+                        musteriCount++;
                         Restaurant.musteriler.add(musteri);
                     }
                 }
                 else{
                     Musteri musteri = new Musteri("Müşteri " + i);
-                    mustericount++;
+                    musteriCount++;
                     Restaurant.musteriler.add(musteri);
                 }
             }
+            adimSayisi--;
         }
 
         for (Musteri musteri : Restaurant.musteriler) {

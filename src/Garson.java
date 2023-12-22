@@ -41,11 +41,13 @@ public class Garson implements Runnable{
                             musteri.AsciIslemleri(Restaurant.ascilar.get(0),musteri); // boş olan aşçıyı müşteriye yolla
                             break;
                         }
-                        if(Restaurant.ascilar.get(1).musterilerim.remainingCapacity() > 0  && (Restaurant.ascilar.get(0).isMesgulMu()==false) && (musteri.isOdemeYapildiMi()==false)){
+                        if((Restaurant.ascilar.get(1).musterilerim.remainingCapacity() > 0)  && (Restaurant.ascilar.get(0).isMesgulMu()==false) && (musteri.isOdemeYapildiMi()==false)){
                             Restaurant.ascilar.get(1).setMusteri(musteri);
                             Restaurant.ascilar.get(1).musterilerim.offer(musteri);
                             Restaurant.ascilar.get(1).setMesgulMu(true);
+                            Restaurant.ascilar.get(1).musterilerim.poll();
                             if(Restaurant.ascilar.get(0).musterilerim != null  && Restaurant.ascilar.get(0).musterilerim.size()>1 ){
+                                Restaurant.ascilar.get(0).musterilerim.poll();
                                 Restaurant.ascilar.get(0).musterilerim.poll();
                             }
                             musteri.AsciIslemleri(Restaurant.ascilar.get(1),musteri); // boş olan aşçıyı müşteriye yolla
