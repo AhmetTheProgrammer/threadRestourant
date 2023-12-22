@@ -3,17 +3,19 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) {
         ArrayList<Garson> garsonlar = new ArrayList<>();
-        int musteriSayisi;
-        int adimSayisi;
+        ConcurrentLinkedQueue<Musteri> oncelikliler = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<Musteri> gecici = new ConcurrentLinkedQueue<>();
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Adım sayısını giriniz");
-        adimSayisi=scanner.nextInt();
+        Random random = new Random();
+        System.out.println("Adım sayısını giriniz:");
+        int adimSayisi=scanner.nextInt();
         Kasa kasa = new Kasa();
         kasa.start();
         for(int i = 1; i <= 6; i++){
@@ -21,11 +23,31 @@ public class Main {
             Restaurant.masalar.add(masa);
         }
         System.out.println("Müşteri sayısı girin:");
-        musteriSayisi = scanner.nextInt();
+        int musteriSayisi = scanner.nextInt();
+        System.out.println("Öncelikli müşteri sayısı girin:");
+        int oncelikliMusteriSayisi = scanner.nextInt();
         for(int i = 1; i <= musteriSayisi; i++){
-            Musteri musteri = new Musteri("Müşteri " + i);
-            Restaurant.musteriler.add(musteri);
-            Thread t=new Thread(musteri);
+            if(oncelikliMusteriSayisi > 0){
+                int oncelik = random.nextInt(0,2);
+                if(oncelik == 1){
+                    Musteri musteri = new Musteri("Müşteri " + i);
+                    musteri.setOncelikliMi(true);
+                    Restaurant.musteriler.addFirst(musteri);
+                    oncelikliMusteriSayisi--;
+                }
+                else{
+                    Musteri musteri = new Musteri("Müşteri " + i);
+                    Restaurant.musteriler.add(musteri);
+                }
+            }
+            else{
+                Musteri musteri = new Musteri("Müşteri " + i);
+                Restaurant.musteriler.add(musteri);
+            }
+        }
+        for (Musteri musteri : Restaurant.musteriler) {
+            musteri.masayaOtur();
+            Thread t = new Thread(musteri);
             t.start();
         }
         //En az 6 müşterinin masası set edilene kadar bekler

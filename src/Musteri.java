@@ -4,6 +4,7 @@ class Musteri implements Runnable {
     private boolean siparisAlindiMi;
     private boolean yemekOlduMu;
     private  boolean odemeYapildiMi;
+    private boolean oncelikliMi;
     private static final Object lock = new Object();
     public Musteri(String isim){
         this.isim = isim;
@@ -16,8 +17,14 @@ class Musteri implements Runnable {
                 if(!masa.isDoluMu()){//Dolu değilse
                     this.setMasa(masa);
                     this.getMasa().setDoluMu(true);
-                    System.out.println(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu");
-                    break;
+                    if(this.isOncelikliMi()){
+                        System.out.println(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu ve oncelikli");
+                        break;
+                    }
+                    else if(!this.isOncelikliMi()){
+                        System.out.println(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu");
+                        break;
+                    }
                 }
             }
         }
@@ -110,5 +117,13 @@ class Musteri implements Runnable {
 
     public void setOdemeYapildiMi(boolean odemeYapildiMi) {
         this.odemeYapildiMi = odemeYapildiMi;
+    }
+
+    public boolean isOncelikliMi() {
+        return oncelikliMi;
+    }
+
+    public void setOncelikliMi(boolean oncelikliMi) {
+        this.oncelikliMi = oncelikliMi;
     }
 }
