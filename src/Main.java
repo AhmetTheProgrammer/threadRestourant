@@ -10,8 +10,10 @@ public class Main {
     public static void main(String[] args) {
         ArrayList<Garson> garsonlar = new ArrayList<>();
         int musteriSayisi;
+        int adimSayisi;
         Scanner scanner = new Scanner(System.in);
-
+        System.out.println("Adım sayısını giriniz");
+        adimSayisi=scanner.nextInt();
         Kasa kasa = new Kasa();
         kasa.start();
         for(int i = 1; i <= 6; i++){
