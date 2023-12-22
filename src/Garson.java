@@ -13,7 +13,7 @@ public class Garson implements Runnable{
     }
     public  void siparisAl() throws InterruptedException {
         synchronized (lock){
-            Musteri musteri = Restaurant.musteriler.poll();
+            Musteri musteri = Restaurant.musteriler.pollFirst();
             if(musteri == null || musteri.getMasa() == null){//müşteri yoksa sipariş alma
                 // lock.wait();
                 Restaurant.musteriler.add(musteri);
@@ -33,7 +33,7 @@ public class Garson implements Runnable{
                             break;
                         }*/
 
-                   //  System.out.println(Restaurant.ascilar.get(0).musterilerim.size());
+                     //  System.out.println(Restaurant.ascilar.get(0).musterilerim.size());
                         if((Restaurant.ascilar.get(0).musterilerim.remainingCapacity() > 0) && (Restaurant.ascilar.get(0).isMesgulMu()==false) && (musteri.isOdemeYapildiMi()==false)){
                             Restaurant.ascilar.get(0).setMusteri(musteri);
                             Restaurant.ascilar.get(0).musterilerim.offer(musteri);

@@ -16,35 +16,44 @@ public class Main {
         Random random = new Random();
         System.out.println("Adım sayısını giriniz:");
         int adimSayisi=scanner.nextInt();
+        int mustericount=1;
         Kasa kasa = new Kasa();
         kasa.start();
         for(int i = 1; i <= 6; i++){
             Masa masa = new Masa("Masa " + i);
             Restaurant.masalar.add(masa);
         }
-        System.out.println("Müşteri sayısı girin:");
-        int musteriSayisi = scanner.nextInt();
-        System.out.println("Öncelikli müşteri sayısı girin:");
-        int oncelikliMusteriSayisi = scanner.nextInt();
-        for(int i = 1; i <= musteriSayisi; i++){
-            if(oncelikliMusteriSayisi > 0){
-                int oncelik = random.nextInt(0,2);
-                if(oncelik == 1){
-                    Musteri musteri = new Musteri("Müşteri " + i);
-                    musteri.setOncelikliMi(true);
-                    Restaurant.musteriler.addFirst(musteri);
-                    oncelikliMusteriSayisi--;
+        int toplam=0;
+        for(int j=0;j<adimSayisi;j++){
+            System.out.println((j+1)+ " .Adımın Müşteri sayısı girin:");
+            int musteriSayisi = scanner.nextInt();
+            toplam=toplam+musteriSayisi;
+            System.out.println("Öncelikli müşteri sayısı girin:");
+            int oncelikliMusteriSayisi = scanner.nextInt();
+            for(int i = mustericount; i <= toplam; i++){
+                if(oncelikliMusteriSayisi > 0){
+                    int oncelik = random.nextInt(0,2);
+                    if(oncelik == 1){
+                        Musteri musteri = new Musteri("Müşteri " + i);
+                        mustericount++;
+                        musteri.setOncelikliMi(true);
+                        Restaurant.musteriler.addFirst(musteri);
+                        oncelikliMusteriSayisi--;
+                    }
+                    else{
+                        Musteri musteri = new Musteri("Müşteri " + i);
+                        mustericount++;
+                        Restaurant.musteriler.add(musteri);
+                    }
                 }
                 else{
                     Musteri musteri = new Musteri("Müşteri " + i);
+                    mustericount++;
                     Restaurant.musteriler.add(musteri);
                 }
             }
-            else{
-                Musteri musteri = new Musteri("Müşteri " + i);
-                Restaurant.musteriler.add(musteri);
-            }
         }
+
         for (Musteri musteri : Restaurant.musteriler) {
             musteri.masayaOtur();
             Thread t = new Thread(musteri);
