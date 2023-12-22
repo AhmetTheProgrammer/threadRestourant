@@ -1,9 +1,18 @@
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 
 class Asci extends Thread {
     private String isim;
     private static final Object lock = new Object();
     Musteri musteri;
+    LinkedBlockingQueue<Musteri> musterilerim = new LinkedBlockingQueue<>(2);
+
     private boolean mesgulMu;
 
     public Asci(String isim){
@@ -59,6 +68,5 @@ class Asci extends Thread {
     public void setMesgulMu(boolean mesgulMu) {
         this.mesgulMu = mesgulMu;
     }
-
 }
 
