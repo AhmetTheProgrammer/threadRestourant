@@ -1,3 +1,7 @@
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 class Musteri implements Runnable {
     private String isim;
     private Masa masa;
@@ -19,10 +23,12 @@ class Musteri implements Runnable {
                     this.getMasa().setDoluMu(true);
                     if(this.isOncelikliMi()){
                         System.out.println(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu ve oncelikli");
+                        Restaurant.dosyayaYaz(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu ve oncelikli");
                         break;
                     }
                     else if(!this.isOncelikliMi()){
                         System.out.println(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu");
+                        Restaurant.dosyayaYaz(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu");
                         break;
                     }
                 }
@@ -33,6 +39,7 @@ class Musteri implements Runnable {
     public void AsciIslemleri(Asci asci, Musteri musteri){
         asci.setMesgulMu(true);
         System.out.println(asci.getIsim() +" "+musteri.getIsim()+" 'in yemeğinin hazırlıyor");
+        Restaurant.dosyayaYaz(asci.getIsim() +" "+musteri.getIsim()+" 'in yemeğinin hazırlıyor");
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
@@ -47,6 +54,7 @@ class Musteri implements Runnable {
         synchronized (lock) {
             try {
                 System.out.println(this.getIsim() + "yemeğini yiyiyor");
+                Restaurant.dosyayaYaz(this.getIsim() + "yemeğini yiyiyor");
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -57,6 +65,7 @@ class Musteri implements Runnable {
     public  void odemeYap(){
         synchronized (lock){
             System.out.println(this.getIsim()+" ödeme yaptı");
+            Restaurant.dosyayaYaz(this.getIsim()+" ödeme yaptı");
             this.setOdemeYapildiMi(true);
             try {
                 Thread.sleep(1000);
