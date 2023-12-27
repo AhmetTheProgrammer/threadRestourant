@@ -8,65 +8,7 @@ import java.io.PrintWriter;
 import java.util.*;
 
 public class Problem1 extends JFrame {
-    public static void problem1(int musteriSayisi, int oncelikliMusteriSayisi, int adimSayisi){
-        ArrayList<Garson> garsonlar = new ArrayList<>();
-        Scanner scanner = new Scanner(System.in);
-        Random random = new Random();
-        Kasa kasa = new Kasa();
-        kasa.start();
 
-        for(int i = 1; i <= 6; i++){
-            Masa masa = new Masa("Masa " + i);
-            Restaurant.masalar.add(masa);
-        }
-        Set<Integer> secilenler = new HashSet<>();
-
-        for (int i = 0; i < musteriSayisi; i++) {
-            int oncelik;
-            do {
-                oncelik = random.nextInt(musteriSayisi) + 1;
-            } while (secilenler.contains(oncelik));
-            secilenler.add(oncelik);
-            Musteri musteri = new Musteri("Müşteri " + oncelik);
-            if (oncelikliMusteriSayisi > 0) {
-                musteri.setOncelikliMi(true);
-                oncelikliMusteriSayisi--;
-            }
-            Restaurant.musteriler.add(musteri);
-        }
-
-        for (Musteri musteri : Restaurant.musteriler) {
-            musteri.masayaOtur();
-            Thread t = new Thread(musteri);
-            t.start();
-        }
-        //En az 6 müşterinin masası set edilene kadar bekler
-        while(true){
-            int doluMasaSayisi = 0;
-            for (Masa masa : Restaurant.masalar) {
-                if(masa.isDoluMu()){
-                    doluMasaSayisi++;
-                }
-            }
-            if(doluMasaSayisi >= 6){
-                break;
-            }
-        }
-
-        for (int i = 1; i <= 2; i++) {
-            Asci asci = new Asci("Aşçı " + i);
-            Restaurant.ascilar.add(asci);
-            asci.start();
-        }
-        for (int i = 1; i <= 3; i++) {
-            Garson garson = new Garson("Garson " + i);
-            garsonlar.add(garson);
-            Thread t=new Thread(garson);
-            t.start();
-        }
-
-
-    }
     Problem1(){
         JPanel  panel = new JPanel();
         add(panel);
@@ -142,7 +84,9 @@ public class Problem1 extends JFrame {
                 for (JTextField text : textFieldsOncelikli) {
                     oncelikli += Integer.parseInt(text.getText());
                 }
-                problem1(toplam, oncelikli, Integer.parseInt(adimSayisi.getText()));
+                Problem1Gui problem1Gui = new Problem1Gui(toplam, oncelikli, Integer.parseInt(adimSayisi.getText()));
+                problem1Gui.setVisible(true);
+                Problem1Gui.problem1(toplam, oncelikli, Integer.parseInt(adimSayisi.getText()));
             }
         });
     }
