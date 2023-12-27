@@ -40,7 +40,8 @@ public class GirisSayfasi extends JFrame {
         problem2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+             Problem2 problem2=new Problem2();
+             problem2.setVisible(true);
             }
 
         });
