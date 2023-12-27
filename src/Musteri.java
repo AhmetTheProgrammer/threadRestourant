@@ -15,20 +15,84 @@ class Musteri implements Runnable {
         this.yemekOlduMu = false;
         odemeYapildiMi=false;
     }
-
-
+    public synchronized void masayaOtur(){
+        boolean oturabilirMi = true;
+        for (Musteri musteri1 : Restaurant.musteriler) {
+            if(musteri1.isOncelikliMi() && musteri1.getMasa() == null){
+                oturabilirMi = false;
+                break;
+            }
+        }
+        synchronized (Restaurant.masalar)  {
+            for (Masa masa : Restaurant.masalar) {
+                if(!masa.isDoluMu()){//Dolu değilse
+                    if(this.isOncelikliMi()){
+                        this.setMasa(masa);
+                        this.getMasa().setDoluMu(true);
+                        this.getMasa().setMusteri(this);
+                        System.out.println(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu ve oncelikli");
+                        Restaurant.dosyayaYaz(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu ve oncelikli");
+                        break;
+                    }
+                    else if(!this.isOncelikliMi() && oturabilirMi){
+                        this.setMasa(masa);
+                        this.getMasa().setDoluMu(true);
+                        this.getMasa().setMusteri(this);
+                        System.out.println(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu");
+                        Restaurant.dosyayaYaz(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu");
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    public void yemekYe(){
+        this.setYemekOlduMu(true);
+        try {
+            System.out.println(this.getIsim() + " yemeğini yiyiyor");
+            Restaurant.dosyayaYaz(this.getIsim() + " yemeğini yiyiyor");
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        odemeYap();
+    }
+    public  void odemeYap(){
+        synchronized (lock){
+            System.out.println(this.getIsim() + " ödeme yapıyor");
+            Restaurant.kasa.setMusteri(this);
+            Restaurant.dosyayaYaz(this.getIsim() + " ödeme yapıyor");
+            this.setOdemeYapildiMi(true);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            Restaurant.kasa.setMusteri(null);
+        }
+        this.getMasa().setDoluMu(false);
+        this.getMasa().setMusteri(null);
+        this.setMasa(null);
+        Restaurant.asilMusteriler.remove(this);
+    }
     public synchronized void yemekBekle(){
         while(!this.isYemekOlduMu())
         {
 
         }
     }
-
     @Override
     public void run() {
-        //masası boşsa sürekli oturmaya çalışır
+        long start = System.currentTimeMillis();
         while(this.getMasa() == null){
-            Method.masayaOtur(this);
+            long end = System.currentTimeMillis();
+            float sec = (end - start) / 1000F;
+            if(sec > 20){
+                System.out.println(this.getIsim() + " 20 saniye bekledi ve masaya oturamadı.");
+                Restaurant.dosyayaYaz(this.getIsim() + " 20 saniye bekledi ve masaya oturamadı.");
+                break;
+            }
+            masayaOtur();
         }
     }
     public String getIsim() {
