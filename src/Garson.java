@@ -12,40 +12,44 @@ public class Garson implements Runnable{
         this.siparisAldıMı = false;
     }
     public  void siparisAl() throws InterruptedException {
-        Musteri musteri = Restaurant.musteriler.pollFirst();
-        if(musteri == null || musteri.getMasa() == null){//müşteri yoksa sipariş alma
-            // lock.wait();
-            Restaurant.musteriler.add(musteri);
-        }else if(musteri.getMasa() != null){//masası varsa sipariş al
-            System.out.println(this.getIsim() + " :" + musteri.getIsim() + "'nin siparişini alıyor.");
-            Restaurant.dosyayaYaz(this.getIsim() + " :" + musteri.getIsim() + "'nin siparişini alıyor.");
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+        Musteri musteri = null;
+        synchronized (lock){
+            if(!Restaurant.musteriler.isEmpty()){
+                musteri = Restaurant.musteriler.pollFirst();
             }
-            while(musteri.isYemekOlduMu() == false){
-                if((Restaurant.ascilar.get(0).musterilerim.remainingCapacity() > 0) && (Restaurant.ascilar.get(0).isMesgulMu()==false) && (musteri.isOdemeYapildiMi()==false)){
-                    Restaurant.ascilar.get(0).setMusteri(musteri);
-                    Restaurant.ascilar.get(0).musterilerim.offer(musteri);
-                    Restaurant.ascilar.get(0).setMesgulMu(true);
-                    Method.AsciIslemleri(Restaurant.ascilar.get(0),musteri); // boş olan aşçıyı müşteriye yolla
-                    break;
+            if(musteri != null && musteri.getMasa() == null){//müşteri yoksa sipariş alma
+                Restaurant.musteriler.add(musteri);
+            }else if(musteri.getMasa() != null){//masası varsa sipariş al
+                System.out.println(this.getIsim() + " :" + musteri.getIsim() + "'nin siparişini alıyor.");
+                Restaurant.dosyayaYaz(this.getIsim() + " :" + musteri.getIsim() + "'nin siparişini alıyor.");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
-                if((Restaurant.ascilar.get(1).musterilerim.remainingCapacity() > 0)  && (Restaurant.ascilar.get(0).isMesgulMu()==false) && (musteri.isOdemeYapildiMi()==false)){
-                    Restaurant.ascilar.get(1).setMusteri(musteri);
-                    Restaurant.ascilar.get(1).musterilerim.offer(musteri);
-                    Restaurant.ascilar.get(1).setMesgulMu(true);
-                    Restaurant.ascilar.get(1).musterilerim.poll();
-                    if(Restaurant.ascilar.get(0).musterilerim != null  && Restaurant.ascilar.get(0).musterilerim.size()>1 ){
-                        Restaurant.ascilar.get(0).musterilerim.poll();
-                        Restaurant.ascilar.get(0).musterilerim.poll();
+                while(musteri.isYemekOlduMu() == false){
+                    if((Restaurant.ascilar.get(0).musterilerim.remainingCapacity() > 0) && (Restaurant.ascilar.get(0).isMesgulMu()==false) && (musteri.isOdemeYapildiMi()==false)){
+                        Restaurant.ascilar.get(0).setMusteri(musteri);
+                        Restaurant.ascilar.get(0).musterilerim.offer(musteri);
+                        Restaurant.ascilar.get(0).setMesgulMu(true);
+                        musteri.AsciIslemleri(Restaurant.ascilar.get(0),musteri); // boş olan aşçıyı müşteriye yolla
+                        break;
                     }
-                    Method.AsciIslemleri(Restaurant.ascilar.get(1),musteri); // boş olan aşçıyı müşteriye yolla
-                    break;
+                    if((Restaurant.ascilar.get(1).musterilerim.remainingCapacity() > 0)  && (Restaurant.ascilar.get(0).isMesgulMu()==false) && (musteri.isOdemeYapildiMi()==false)){
+                        Restaurant.ascilar.get(1).setMusteri(musteri);
+                        Restaurant.ascilar.get(1).musterilerim.offer(musteri);
+                        Restaurant.ascilar.get(1).setMesgulMu(true);
+                        Restaurant.ascilar.get(1).musterilerim.poll();
+                        if(Restaurant.ascilar.get(0).musterilerim != null  && Restaurant.ascilar.get(0).musterilerim.size()>1 ){
+                            Restaurant.ascilar.get(0).musterilerim.poll();
+                            Restaurant.ascilar.get(0).musterilerim.poll();
+                        }
+                        musteri.AsciIslemleri(Restaurant.ascilar.get(1),musteri); // boş olan aşçıyı müşteriye yolla
+                        break;
+                    }
                 }
+                bekle();
             }
-            bekle();
         }
     }
     public synchronized void bekle(){
@@ -59,7 +63,7 @@ public class Garson implements Runnable{
     public void run() {
         while(!Restaurant.musteriler.isEmpty()){
             try {
-                this.siparisAl();
+                siparisAl();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

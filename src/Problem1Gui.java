@@ -28,15 +28,11 @@ public class Problem1Gui extends JFrame {
             }
             Restaurant.musteriler.add(musteri);
         }
-
-
         for (Musteri musteri : Restaurant.musteriler) {
-            Method.masayaOtur(musteri);
+            musteri.masayaOtur();
             Thread t = new Thread(musteri);
             t.start();
         }
-
-
         for (int i = 1; i <= 2; i++) {
             Asci asci = new Asci("Aşçı " + i);
             Restaurant.ascilar.add(asci);
