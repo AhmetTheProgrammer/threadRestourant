@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.util.*;
 
 public class Problem1Gui extends JFrame {
-    public static void problem1(int musteriSayisi, int oncelikliMusteriSayisi, int adimSayisi){
+    /*public static void problem1(int musteriSayisi, int oncelikliMusteriSayisi, int adimSayisi){
         ArrayList<Garson> garsonlar = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
         Random random = new Random();
@@ -45,7 +45,7 @@ public class Problem1Gui extends JFrame {
             t.start();
         }
     }
-
+    */
    public Problem1Gui(int toplam ,int oncelikli,int adimSayisi){
         JPanel  panel = new JPanel();
         add(panel);

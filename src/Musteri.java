@@ -26,14 +26,18 @@ class Musteri implements Runnable {
         synchronized (Restaurant.masalar)  {
             for (Masa masa : Restaurant.masalar) {
                 if(!masa.isDoluMu()){//Dolu değilse
-                    this.setMasa(masa);
-                    this.getMasa().setDoluMu(true);
                     if(this.isOncelikliMi()){
+                        this.setMasa(masa);
+                        this.getMasa().setDoluMu(true);
+                        this.getMasa().setMusteri(this);
                         System.out.println(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu ve oncelikli");
                         Restaurant.dosyayaYaz(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu ve oncelikli");
                         break;
                     }
                     else if(!this.isOncelikliMi() && oturabilirMi){
+                        this.setMasa(masa);
+                        this.getMasa().setDoluMu(true);
+                        this.getMasa().setMusteri(this);
                         System.out.println(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu");
                         Restaurant.dosyayaYaz(this.getIsim() + " " + this.getMasa().getIsim() + "a oturdu");
                         break;
@@ -42,46 +46,34 @@ class Musteri implements Runnable {
             }
         }
     }
-
-    public void AsciIslemleri(Asci asci, Musteri musteri){
-        asci.setMesgulMu(true);
-        System.out.println(asci.getIsim() +" "+musteri.getIsim()+" 'in yemeğinin hazırlıyor");
-        Restaurant.dosyayaYaz(asci.getIsim() +" "+musteri.getIsim()+" 'in yemeğinin hazırlıyor");
+    public void yemekYe(){
+        this.setYemekOlduMu(true);
         try {
+            System.out.println(this.getIsim() + " yemeğini yiyiyor");
+            Restaurant.dosyayaYaz(this.getIsim() + " yemeğini yiyiyor");
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        musteri.setYemekOlduMu(true);
-        asci.setMusteri(null);
-        asci.setMesgulMu(false);
-        yemekYe(musteri);
-    }
-    public  void yemekYe(Musteri musteri){
-        synchronized (lock) {
-            try {
-                System.out.println(this.getIsim() + "yemeğini yiyiyor");
-                Restaurant.dosyayaYaz(this.getIsim() + "yemeğini yiyiyor");
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            odemeYap();
-        }
+        odemeYap();
     }
     public  void odemeYap(){
         synchronized (lock){
-            System.out.println(this.getIsim()+" ödeme yaptı");
-            Restaurant.dosyayaYaz(this.getIsim()+" ödeme yaptı");
+            System.out.println(this.getIsim() + " ödeme yapıyor");
+            Restaurant.kasa.setMusteri(this);
+            Restaurant.dosyayaYaz(this.getIsim() + " ödeme yapıyor");
             this.setOdemeYapildiMi(true);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            Restaurant.kasa.setMusteri(null);
         }
         this.getMasa().setDoluMu(false);
+        this.getMasa().setMusteri(null);
         this.setMasa(null);
+        Restaurant.asilMusteriler.remove(this);
     }
     public synchronized void yemekBekle(){
         while(!this.isYemekOlduMu())
@@ -96,8 +88,8 @@ class Musteri implements Runnable {
             long end = System.currentTimeMillis();
             float sec = (end - start) / 1000F;
             if(sec > 20){
-                System.out.println(this.getIsim() + " masaya oturamadı.");
-                Restaurant.dosyayaYaz(this.getIsim() + " masaya oturamadı.");
+                System.out.println(this.getIsim() + " 20 saniye bekledi ve masaya oturamadı.");
+                Restaurant.dosyayaYaz(this.getIsim() + " 20 saniye bekledi ve masaya oturamadı.");
                 break;
             }
             masayaOtur();
