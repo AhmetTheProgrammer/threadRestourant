@@ -24,13 +24,15 @@ public class Problem1 extends JFrame {
         pe.addMember(Restaurant.kasa);
         Thread thread = new Thread(Restaurant.kasa);
         thread.start();
+        int asagi = 0;
         int masaX = 70;
         int masaY = 70;
         int masaBoyutX = 100;
-        for(int i = 1; i <= 7; i++){
-            if(i % (6/2 + 1) == 0){
+        for(int i = 1; i <= 6; i++){
+            if(i % (4 + 3 * asagi) == 0 ){
                 masaY+= 200;
                 masaX = 70;
+                asagi++;
             }
             Masa masa = new Masa("Masa " + i,masaX,masaY,masaBoyutX);
             Restaurant.masalar.add(masa);
